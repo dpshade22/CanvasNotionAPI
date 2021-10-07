@@ -14,8 +14,9 @@ course_id = 0
 
 # Class implementation of canvas API
 class CanvasApi:
-    def __init__(self, ApiToken):
+    def __init__(self, ApiToken, schoolPrefix = ''):
         self.ApiToken = ApiToken
+        self.schoolPrefix = schoolPrefix
         self.header = {
             'Authorization': 'Bearer ' + self.ApiToken
         }
@@ -23,7 +24,7 @@ class CanvasApi:
 
     def get_course_objects(self):
         params = {'per_page': 50,'include': ['concluded']}
-        readUrl = 'https://uk.instructure.com/api/v1/courses'
+        readUrl = f'https://{self.schoolPrefix}.instructure.com/api/v1/courses'
         classes = []
         courses = requests.request('GET', readUrl, headers = self.header, params = params).json()
 
@@ -33,33 +34,33 @@ class CanvasApi:
 
                 if name != None:
                     name = name.replace(' ', '')
-                    
+
                 cleanName = ""
                 num = 0
 
                 while name[num].isalpha() or name[num] == '/' or name[num] == '-':
                     cleanName += name[num]
-                    
+
                     if name[num] == name[-1]:
                         break
 
                     num += 1
-                    
-                    
+
+
                 while name[num].isdigit() and num < 6:
                     cleanName += name[num]
 
                     if name[num] == name[-1]:
                         break
-                    
+
                     num += 1
-                
+
                 classObj = Class(i.get('id'), cleanName, i.get('enrollment_term_id'), i.get('assignments'))
                 classes.append(classObj)
-            
+
         return classes
 
-    # Initialize self.courses dictionary with the key being 
+    # Initialize self.courses dictionary with the key being
 
     def set_courses_and_id(self):
         for courseObject in self.get_course_objects():
@@ -75,20 +76,20 @@ class CanvasApi:
     # Returns a list of all assignment objects for a given course
 
     def get_assignment_objects(self, courseName, timeframe = None):
-        readUrl = f"https://uk.instructure.com/api/v1/courses/{self.courses[courseName]}/assignments/"
+        readUrl = f'https://{self.schoolPrefix}.instructure.com/api/v1/courses/{self.courses[courseName]}/assignments/'
 
         params = {'per_page': 150, 'bucket': timeframe}
 
         assignments = requests.request('GET', readUrl, headers = self.header, params = params).json()
         assignmentList = []
-        
+
         for assignment in assignments:
             if assignment['due_at'] == None:
                 assignment['due_at'] = '2021-01-01T00:00:00Z'
 
             assignmentList.append(assignment)
             # print(assignment['due_at'])
-            
+
 
         return assignmentList
 
@@ -98,24 +99,3 @@ class CanvasApi:
     def list_classes_names(self):
         for course in self.get_course_objects():
             print(course.name)
-
-
-ThomasKey = '1139~M18a2QGkPYaecy8DKZLUp5RtIrigKkhnz06jxJtkBiFta2MLNtXePFzaABKRpRBt'
-DylanKey = '1139~kE8urdkqWheintaJxrDcr2DUpSinhzkrAyoRhmTNdmdqwe4kHe1SL66E2NoYVDUi'
-AlyssaKey = '1139~FlWriq4RPOJw1vlRgEeVQ3CDno71EevK3Q4rAaZSbhhP6k1UwM2zBZdRFmLJ0obH'
-
-AlyssaCanvas = CanvasApi(AlyssaKey)
-ThomasCanvas = CanvasApi(ThomasKey)
-DylanCanvas = CanvasApi(DylanKey)
-
-# ThomasCanvas.set_courses_and_id()
-# ThomasCanvas.list_classes_names()
-# ThomasCanvas.get_assignments('CIS 300 F21 Sections 003 & 004')
-
-# DylanCanvas.set_courses_and_id()
-# print(DylanCanvas.get_course_objects())
-
-AlyssaCanvas.set_courses_and_id()
-# AlyssaCanvas.list_classes_names()s
-AlyssaCanvas.get_assignment_objects('CIS111')
-
