@@ -1,5 +1,6 @@
-import requests
-import json
+import requests, json
+from datetime import date
+from dateutil.relativedelta import relativedelta
 from requests.auth import HTTPBasicAuth
 
 
@@ -21,8 +22,56 @@ class CanvasApi:
         self.header = {"Authorization": "Bearer " + self.canvasKey}
         self.courses = {}
 
-    def get_course_objects(self):
-        params = {"per_page": 200, "include": ["concluded"]}
+    def get_courses_within_six_months(self):
+        params = {
+            "per_page": 200,
+            "include": ["concluded"],
+            "enrollment_state": ["active"],
+        }
+        readUrl = f"https://{self.schoolPrefix}.instructure.com/api/v1/courses"
+        classes = []
+        courses = requests.request(
+            "GET", readUrl, headers=self.header, params=params
+        ).json()
+
+        for course in courses:
+            datedate = ""
+            ndx = 0
+
+            if course.get("start_at") != None:
+                while course.get("start_at")[ndx] != "T":
+                    datedate += course.get("start_at")[ndx]
+                    ndx += 1
+
+                j = date.fromisoformat(datedate)
+                six_months_ago = date.today() - relativedelta(months=6)
+
+            if j < six_months_ago:
+                continue
+
+            if course.get("name") != None:
+                name = course.get("name")
+                name = cleanCourseName(name)
+
+                classObj = Class(
+                    course.get("id"),
+                    name,
+                    course.get("enrollment_term_id"),
+                    course.get("assignments"),
+                )
+
+                if j < six_months_ago:
+                    continue
+                else:
+                    classes.append(classObj)
+        return classes
+
+    def get_all_courses(self):
+        params = {
+            "per_page": 200,
+            "include": ["concluded"],
+            "enrollment_state": ["active"],
+        }
         readUrl = f"https://{self.schoolPrefix}.instructure.com/api/v1/courses"
         classes = []
         courses = requests.request(
@@ -30,44 +79,22 @@ class CanvasApi:
         ).json()
 
         for i in courses:
-            if i.get("name") != None and i.get("enrollment_term_id") == 10738:
+            if i.get("name") != None:
                 name = i.get("name")
-
-                if name != None:
-                    name = name.replace(" ", "")
-
-                cleanName = ""
-                num = 0
-
-                while name[num].isalpha() or name[num] == "/" or name[num] == "-":
-                    cleanName += name[num]
-
-                    if name[num] == name[-1]:
-                        break
-
-                    num += 1
-
-                while name[num].isdigit() and num < 6:
-                    cleanName += name[num]
-
-                    if name[num] == name[-1]:
-                        break
-
-                    num += 1
+                name = cleanCourseName(name)
 
                 classObj = Class(
                     i.get("id"),
-                    cleanName,
+                    name,
                     i.get("enrollment_term_id"),
                     i.get("assignments"),
                 )
                 classes.append(classObj)
-
         return classes
 
     # Initialize self.courses dictionary with the key being
     def set_courses_and_id(self):
-        for courseObject in self.get_course_objects():
+        for courseObject in self.get_all_courses():
             if courseObject != None:
                 self.courses[courseObject.name] = courseObject.id
 
@@ -134,3 +161,28 @@ class CanvasApi:
     def list_classes_names(self):
         for course in self.get_course_objects():
             print(course.name)
+
+
+def cleanCourseName(name):
+    cleanName = ""
+    num = 0
+
+    if name != None:
+        name = name.replace(" ", "")
+
+    while name[num].isalpha() or name[num] == "/" or name[num] == "-":
+        cleanName += name[num]
+
+        if name[num] == name[-1]:
+            break
+
+        num += 1
+
+    while name[num].isdigit() and num < 6:
+        cleanName += name[num]
+
+        if name[num] == name[-1]:
+            break
+
+        num += 1
+    return cleanName
