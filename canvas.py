@@ -96,22 +96,12 @@ class CanvasApi:
                     i += 1
                 assignment["due_at"] = newDueDate
 
-                # if assignment.get("url") == None:
             assignment["url"] = assignment["html_url"]
-            # else:
-            #     assignment["url"] = (
-            #         requests.request("GET", url=assignment["url"], headers=self.header)
-            #         .json()
-            #         .get("url")
-            #     )
-
             assignmentList.append(assignment)
-            # print(assignment['due_at'])
 
         return assignmentList
 
     # Prints version of all currently enrolled classes
-
     def update_assignment_objects(
         self, notionAssignmentsList, courseName, timeframe=None
     ):
