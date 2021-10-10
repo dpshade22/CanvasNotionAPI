@@ -31,7 +31,7 @@ class User:
         return self.canvasProfile.get_all_courses()
 
     # Enters assignments into given database given (by id), or creates a new database, and fills the page with assignments not already found in the database
-    def enterAssignments(self, courseList):
+    def enterAssignmentsToNotionDb(self, courseList):
         if not self.notionProfile.test_if_database_id_exists():
             self.notionProfile = NotionApi(
                 self.notionToken,
