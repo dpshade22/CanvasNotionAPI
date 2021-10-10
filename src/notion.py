@@ -60,6 +60,11 @@ class NotionApi:
                 }
             ],
             "properties": {
+                "State": {
+                    "formula": {
+                        "expression": '(dateBetween(prop("Due Date"), now(), "days") == 0) ? "🟧" : ((dateBetween(prop("Due Date"), now(), "days") < 0) ? "🟥" : "🟩")'
+                    }
+                },
                 "Status": {
                     "select": {
                         "options": [
@@ -76,6 +81,7 @@ class NotionApi:
                 },
                 "Due Date": {"date": {}},
                 "URL": {"url": {}},
+                "Notes": {"rich_text": {}},
             },
         }
 
@@ -87,6 +93,8 @@ class NotionApi:
             headers=self.notionHeaders,
             data=data,
         )
+
+        print(res.text)
 
         newDbId = json.loads(res.text).get("id")
 
