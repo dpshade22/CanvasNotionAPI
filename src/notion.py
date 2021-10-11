@@ -112,6 +112,11 @@ class NotionApi:
         if dueDate["start"] == None:
             dueDate = None
 
+        # if status:
+        #     status = "To do"
+        # else:
+        #     status = "Completed"
+
         createUrl = "https://api.notion.com/v1/pages"
 
         newPageData = {

@@ -26,7 +26,7 @@ class CanvasApi:
             "include": ["concluded"],
             "enrollment_state": ["active"],
         }
-        readUrl = f"https://{self.schoolAb}.instructure.com/api/v1/courses"
+        readUrl = f"https://{self.schoolAb}.com/api/v1/courses"
         classes = []
         courses = requests.request(
             "GET", readUrl, headers=self.header, params=params
@@ -68,7 +68,7 @@ class CanvasApi:
             "include": ["concluded"],
             "enrollment_state": ["active"],
         }
-        readUrl = f"https://{self.schoolAb}.instructure.com/api/v1/courses"
+        readUrl = f"https://{self.schoolAb}.com/api/v1/courses"
         classes = []
         courses = requests.request(
             "GET", readUrl, headers=self.header, params=params
@@ -100,7 +100,7 @@ class CanvasApi:
 
     # Returns a list of all assignment objects for a given course
     def get_assignment_objects(self, courseName, timeframe=None):
-        readUrl = f"https://{self.schoolAb}.instructure.com/api/v1/courses/{self.courses[courseName]}/assignments/"
+        readUrl = f"https://{self.schoolAb}.com/api/v1/courses/{self.courses[courseName]}/assignments/"
         params = {"per_page": 500, "bucket": timeframe}
 
         assignments = requests.request(
@@ -128,7 +128,7 @@ class CanvasApi:
     def update_assignment_objects(
         self, notionAssignmentsList, courseName, timeframe=None
     ):
-        readUrl = f"https://{self.schoolAb}.instructure.com/api/v1/courses/{self.courses[courseName]}/assignments/"
+        readUrl = f"https://{self.schoolAb}.com/api/v1/courses/{self.courses[courseName]}/assignments/"
         params = {"per_page": 500, "bucket": timeframe}
 
         assignments = requests.request(
@@ -145,7 +145,9 @@ class CanvasApi:
                 while assignment["due_at"][i] != "T":
                     newDueDate += assignment["due_at"][i]
                     i += 1
-                assignment["due_at"] = newDueDate
+
+                newDueDate = date.fromisoformat(newDueDate) - relativedelta(days=1)
+                assignment["due_at"] = str(newDueDate)
 
             assignment["url"] = assignment["html_url"]
 
