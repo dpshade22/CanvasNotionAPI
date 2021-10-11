@@ -11,9 +11,7 @@ class Class:
         self.assignments = []
         self.term_id = term_id
 
-
-course_id = 0
-
+        
 # Class implementation of canvas API
 class CanvasApi:
     def __init__(self, canvasKey, schoolPrefix=""):
