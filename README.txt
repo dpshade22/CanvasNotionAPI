@@ -14,7 +14,8 @@ Notion
 
 1. Set up account if haven't already
 2. Create a new page
-3. Share the page with the public Integration
-4. Copy the page ID
+3. Create a new Notion integration
+4. Share the page with a workspace integration
+5. Copy the page ID
 
 Create a User class with all the necessary tokens and you can now call the functions to populate your Notion database
