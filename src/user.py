@@ -24,9 +24,11 @@ class User:
             schoolAb=schoolAb,
         )
 
+    # Shorthand fucntion for getting list of courses that started within the past 6 months from Canvas
     def getCoursesLastSixMonths(self):
         return self.canvasProfile.get_courses_within_six_months()
 
+    # Shorthand fucntion for getting list of all courses from Canvas
     def getAllCourses(self):
         return self.canvasProfile.get_all_courses()
 

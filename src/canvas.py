@@ -11,12 +11,12 @@ class Class:
         self.assignments = []
         self.term_id = term_id
 
-        
+
 # Class implementation of canvas API
 class CanvasApi:
-    def __init__(self, canvasKey, schoolPrefix=""):
+    def __init__(self, canvasKey, schoolAb=""):
         self.canvasKey = canvasKey
-        self.schoolPrefix = schoolPrefix
+        self.schoolAb = schoolAb
         self.header = {"Authorization": "Bearer " + self.canvasKey}
         self.courses = {}
 
@@ -26,25 +26,25 @@ class CanvasApi:
             "include": ["concluded"],
             "enrollment_state": ["active"],
         }
-        readUrl = f"https://{self.schoolPrefix}.instructure.com/api/v1/courses"
+        readUrl = f"https://{self.schoolAb}.instructure.com/api/v1/courses"
         classes = []
         courses = requests.request(
             "GET", readUrl, headers=self.header, params=params
         ).json()
 
         for course in courses:
-            datedate = ""
+            startDate = ""
             ndx = 0
 
             if course.get("start_at") != None:
                 while course.get("start_at")[ndx] != "T":
-                    datedate += course.get("start_at")[ndx]
+                    startDate += course.get("start_at")[ndx]
                     ndx += 1
 
-                j = date.fromisoformat(datedate)
-                six_months_ago = date.today() - relativedelta(months=6)
+                classStartDate = date.fromisoformat(startDate)
+                sixMonthsAgo = date.today() - relativedelta(months=6)
 
-            if j < six_months_ago:
+            if classStartDate < sixMonthsAgo:
                 continue
 
             if course.get("name") != None:
@@ -58,10 +58,8 @@ class CanvasApi:
                     course.get("assignments"),
                 )
 
-                if j < six_months_ago:
-                    continue
-                else:
-                    classes.append(classObj)
+                classes.append(classObj)
+
         return classes
 
     def get_all_courses(self):
@@ -70,7 +68,7 @@ class CanvasApi:
             "include": ["concluded"],
             "enrollment_state": ["active"],
         }
-        readUrl = f"https://{self.schoolPrefix}.instructure.com/api/v1/courses"
+        readUrl = f"https://{self.schoolAb}.instructure.com/api/v1/courses"
         classes = []
         courses = requests.request(
             "GET", readUrl, headers=self.header, params=params
@@ -102,7 +100,7 @@ class CanvasApi:
 
     # Returns a list of all assignment objects for a given course
     def get_assignment_objects(self, courseName, timeframe=None):
-        readUrl = f"https://{self.schoolPrefix}.instructure.com/api/v1/courses/{self.courses[courseName]}/assignments/"
+        readUrl = f"https://{self.schoolAb}.instructure.com/api/v1/courses/{self.courses[courseName]}/assignments/"
         params = {"per_page": 500, "bucket": timeframe}
 
         assignments = requests.request(
@@ -130,7 +128,7 @@ class CanvasApi:
     def update_assignment_objects(
         self, notionAssignmentsList, courseName, timeframe=None
     ):
-        readUrl = f"https://{self.schoolPrefix}.instructure.com/api/v1/courses/{self.courses[courseName]}/assignments/"
+        readUrl = f"https://{self.schoolAb}.instructure.com/api/v1/courses/{self.courses[courseName]}/assignments/"
         params = {"per_page": 500, "bucket": timeframe}
 
         assignments = requests.request(
