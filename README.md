@@ -3,7 +3,7 @@
 ## Canvas
 
 1. Go into your school's Canvas page
-2. Copy the the part of your Canvas URL that is after "https://" and before ".com". This will be your schoolAb 
+2. Copy the the part of your Canvas URL that is after ***"https://"*** and before ***".com"***. This will be your schoolAb 
 3. Go into settings
 4. Scroll down to "Approved integrations"
 5. Click new access token
